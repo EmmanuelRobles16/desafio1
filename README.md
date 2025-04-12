@@ -16,8 +16,11 @@
 
 Este informe presenta el análisis y diseño de la solución para el Desafío 1 de Informática II. El reto consiste en recuperar una imagen BMP original que ha sido sometida a una serie de transformaciones a nivel de bits, tales como operaciones XOR, rotaciones y desplazamientos, y posteriormente enmascarada con una máscara de color. Para resolverlo, se debe implementar un sistema capaz de aplicar estas transformaciones en orden inverso y validar los resultados con archivos de rastreo proporcionados.
 
+## 2 Anilisis del problema
 
-## 2 Planteamiento de funciones
+Despues de investigar en como se podia solucionar el problema y repasar los temas vistos en clase y la explicacion de los profesores en las clases para este desafio llegamos a una porsible solucion la cual se basa en la revesibilidad, cada accion que debe tener la capacidad de ser revertida y comparar con lo texto que se nos fueron dados y verificar si si coinciden 
+
+## 3 Planteamiento de funciones
 
 Cargar archivos:
 ── ID (imagen final)
