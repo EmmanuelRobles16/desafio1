@@ -58,39 +58,52 @@ Se nos da código base para:
 
 **Características clave:**
 
-1. Las transformaciones se aplicaron en orden desconocido (variable entre casos)
+1. Las transformaciones se aplicaron en orden desconocido 
 
 2. Cada enmascaramiento usó una posición aleatoria diferente (s)
 
-3. El último paso nunca incluyó enmascaramiento (según especificaciones)
+3. El último paso nunca incluyó enmascaramiento (según las especificaciones del pdf)
+
+### 2.2 Alternativa de solución
+
+Después de analizar cómo se podía solucionar el problema, repasar los temas vistos en clase y la explicación de los profesores en las clases, para este desafío llegamos a una posible solución, la cual se basa en la reversibilidad: cada acción debe tener la capacidad de ser revertida y comparada con los archivos de texto que se nos dieron, para verificar si coinciden.
+
+Así que, para resolver el problema, se propone el siguiente enfoque:
+
+***Aplicar transformaciones inversas:*** Se probarán diferentes combinaciones de operaciones inversas (como XOR y rotaciones en dirección opuesta) sobre la imagen distorsionada Io. Dado que el XOR es reversible (aplicarlo dos veces cancela el efecto), y las rotaciones pueden invertirse rotando en la dirección contraria, estas operaciones permiten recuperar estados anteriores de la imagen.
+
+***Validación con archivos .txt:*** Después de cada transformación inversa, se aplicará el enmascaramiento a una porción de la imagen y se comparará con los datos del archivo .txt correspondiente. Si coinciden, significa que la transformación inversa fue correcta y se procederá a la siguiente etapa; de lo contrario, se probará otra combinación.
+
+***Reconstrucción final:*** Una vez revertidas todas las transformaciones en el orden correcto, se obtendrá la imagen original.
+
+Para manejar las imágenes de forma eficiente, utilizaremos memoria dinámica mediante arreglos bidimensionales y punteros, lo que exige especial cuidado en: (1) la correcta asignación y liberación de memoria, (2) el acceso seguro a los píxeles mediante aritmética de punteros, y (3) la prevención de fugas de memoria.
 
 
-Despues de investigar en como se podia solucionar el problema y repasar los temas vistos en clase y la explicacion de los profesores en las clases para este desafio llegamos a una porsible solucion la cual se basa en la revesibilidad, cada accion que debe tener la capacidad de ser revertida y comparar con lo texto que se nos fueron dados y verificar si si coinciden
 
 
-### Planteamiento de funciones 
+### 2.3 Planteamiento de funciones 
 
 Cargar archivos:
-── ID (imagen final)
-── M (máscara de enmascaramiento)
-── Archivos M1.txt, M2.txt, ..., MN.txt
+- Iᴅ (imagen final)
+- M (máscara de enmascaramiento)
+- Archivos M1.txt, M2.txt, ..., MN.txt
 
 Implementar funciones de transformación:
-   ─ XOR entre imágenes
-    ─ Rotación de bits izquierda/derecha
-   ─ Desplazamiento de bits izquierda/derecha
+- XOR entre imágenes
+- Rotación de bits izquierda/derecha
+- Desplazamiento de bits izquierda/derecha
 
 Implementar funciones inversas de las anteriores
 
- Implementar verificación de enmascaramiento:
- ── Extraer segmento desde semilla 's'
-── Sumar con la máscara
-  ── Comparar con datos del archivo .txt
+Implementar verificación de enmascaramiento:
+- Extraer segmento desde semilla 's'
+- Sumar con la máscara
+- Comparar con datos del archivo .txt
 
- Algoritmo de reconstrucción:
-   ── Probar combinaciones de transformaciones
- ─ Validar paso a paso con archivos .txt
-── Al validar todos los pasos → se obtiene imagen original IO
+Algoritmo de reconstrucción:
+- Probar combinaciones de transformaciones
+- Validar paso a paso con archivos .txt
+- Al validar todos los pasos → se obtiene imagen original IO
 
 
 
