@@ -46,15 +46,7 @@ Se nos da código base para:
 
 - Exportar arreglos dinámicos como imágenes
 
-- Dos conjuntos de datos de prueba (Caso 1 y Caso 2) que incluyen:
-
-   -Imagen distorsionada final (Iᴅ)
-
-   -Imagen aleatoria (IM)
-  
-   -Máscara (M)
-  
-   -Archivos .txt generados en cada etapa
+- Dos ejemplos prácticos completos (Caso 1 y Caso 2) que incluyen: Imagen distorsionada final (Iᴅ), imagen aleatoria (IM), máscara (M), archivos .txt generados en cada etapa
 
 **Características clave:**
 
@@ -105,5 +97,11 @@ Algoritmo de reconstrucción:
 - Validar paso a paso con archivos .txt
 - Al validar todos los pasos → se obtiene imagen original IO
 
-
+## 3. Conclusiones
+  
+-    Las transformaciones a nivel de bits (XOR, rotaciones) son reversibles matemáticamente, permiten reconstruir la imagen original al aplicar las operaciones inversas en el orden correcto.
+  
+-    Los archivos `.txt` nos ayudan a que no estemos en un proceso ciego, confirmando mediante comparación numérica si una transformación inversa aplicada es la correcta.
+  
+-    El uso de arreglos bidimensionales dinámicos mediante punteros requiere un buen manejo de memoria para evitar que no hayan fugas y accesos inválidos.
 
