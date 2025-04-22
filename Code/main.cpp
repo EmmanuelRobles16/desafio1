@@ -40,6 +40,7 @@ using namespace std;
 unsigned char* loadPixels(QString input, int &width, int &height);
 bool exportImage(unsigned char* pixelData, int width,int height, QString archivoSalida);
 unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixels);
+void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes);
 
 int main()
 {
@@ -268,6 +269,11 @@ unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixel
     return RGB;
 }
 
+void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = pixelData[i] ^ imData[i];
+    }
+}
 
 
 
