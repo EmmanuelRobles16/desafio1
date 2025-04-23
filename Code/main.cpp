@@ -41,6 +41,9 @@ unsigned char* loadPixels(QString input, int &width, int &height);
 bool exportImage(unsigned char* pixelData, int width,int height, QString archivoSalida);
 unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixels);
 void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes);
+void rotarDerecha(unsigned char* pixelData, int totalBytes, int n);
+void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n);
+
 
 int main()
 {
@@ -273,6 +276,18 @@ unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixel
 void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes) {
     for (int i = 0; i < totalBytes; i++) {
         pixelData[i] = pixelData[i] ^ imData[i];
+    }
+}
+
+void rotarDerecha(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = ((pixelData[i] >> n) | (pixelData[i] << (8 - n))) & 0xFF;
+    }
+}
+
+void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = ((pixelData[i] << n) | (pixelData[i] >> (8 - n))) & 0xFF;
     }
 }
 
