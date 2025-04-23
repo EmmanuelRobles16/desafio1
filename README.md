@@ -156,3 +156,28 @@ void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
 ```
 & 0xFF garantiza que solo operamos con un byte (8 bits), ignorando cualquier extensión de signo o bits superiores. Evita resultados incorrectos debido a bits no deseados.
 
+*** 4 y 5 función ***
+
+Estas fueron las siguientes funciones desarrolladas, son las funciones de desplazamiento. Usamos la misma lógica que con la funcion XOR y función 2 y 3, solo que aplicando la operacion de desplazar bits a la derecha y a la izquierda, implementamos estas dos ya que no sabemos cual de las dos rotaciones es la que nos servirá, las funciones que creamos fueron las siguientes: 
+
+```cpp
+void desplazarDerecha(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = pixelData[i] >> n; // pierde bits
+    }
+}
+
+void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = (pixelData[i] << n) & 0xFF;
+    }
+}
+```
+
+Esta funcion hace que cuando se desplaze hacia la derecha se pierdan los bits menos significativos que es la derecha y entran ceros por los bits mas significativos que es la izquierda, y con la función de desplazar hacia la izquierda es la inversa pero se usa &0xFF para matener el resulta de los 8 bits como en las funciones 2 y 3
+
+
+
+
+
+
