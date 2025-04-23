@@ -105,3 +105,33 @@ Algoritmo de reconstrucción:
   
 -    El uso de arreglos bidimensionales dinámicos mediante punteros requiere un buen manejo de memoria para evitar que no hayan fugas y accesos inválidos.
 
+
+
+
+## Algoritmos implementados y la documentación de sus funciones
+
+# operaciones a nivel de bits
+
+La primera función desarrollada para resolver el desafío fue la de XOR. Se consideraron dos formas de implementarla, pero principalmente se decidió por una versión con memoria dinámica, que creaba un puntero para reescribir todo el buffer original y luego aplicaba el XOR. Sin embargo, esta versión resultó menos eficiente, comparada con la que no usa punteros; se implementaron ambas y se compararon:
+
+unsigned char* aplicarXORDinamico(const unsigned char* pixelData, const unsigned char* imData, int totalBytes)
+{
+    unsigned char* resultado = new unsigned char[totalBytes];
+    for (int i = 0; i < totalBytes; ++i) {
+        resultado[i] = pixelData[i] ^ imData[i];
+    }
+    return resultado;
+}
+
+En cambio, la versión que se empleó para el desafío no es muy diferente en cuanto a funcionamiento, pero resuelve el mismo problema sin necesidad de reservar memoria adicional ni de reescribir todo el buffer original:
+
+void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = pixelData[i] ^ imData[i];
+    }
+}
+
+Lo que hace esta función es tomar el arreglo de la imagen distorsionada, el arreglo de la imagen máscara y la cantidad de valores en total (bytes). Recorre cada posición desde 0 hasta totalBytes - 1 (ya que se usa < y no <=). En cada posición toma el valor de pixelData[i] y el de imData[i], les aplica la lógica del XOR, que en C++ se representa con ^, y guarda este resultado en pixelData[i].
+
+
+
