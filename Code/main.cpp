@@ -43,8 +43,8 @@ unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixel
 void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes);
 void rotarDerecha(unsigned char* pixelData, int totalBytes, int n);
 void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n);
-
-
+void desplazarDerecha(unsigned char* pixelData, int totalBytes, int n);
+void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n);
 int main()
 {
     // Definición de rutas de archivo de entrada (imagen original) y salida (imagen modificada)
@@ -288,6 +288,18 @@ void rotarDerecha(unsigned char* pixelData, int totalBytes, int n) {
 void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
     for (int i = 0; i < totalBytes; i++) {
         pixelData[i] = ((pixelData[i] << n) | (pixelData[i] >> (8 - n))) & 0xFF;
+    }
+}
+
+void desplazarDerecha(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = pixelData[i] >> n; // pierde bits
+    }
+}
+
+void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = (pixelData[i] << n) & 0xFF;
     }
 }
 
