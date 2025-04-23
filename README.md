@@ -107,13 +107,15 @@ Algoritmo de reconstrucción:
 
 
 
+--- 
 
 ## Algoritmos implementados y la documentación de sus funciones
+**Operaciones a nivel de bits**
 
-# operaciones a nivel de bits
+***1 función:***
 
 La primera función desarrollada para resolver el desafío fue la de XOR. Se consideraron dos formas de implementarla, pero principalmente se decidió por una versión con memoria dinámica, que creaba un puntero para reescribir todo el buffer original y luego aplicaba el XOR. Sin embargo, esta versión resultó menos eficiente, comparada con la que no usa punteros; se implementaron ambas y se compararon:
-
+```cpp
 unsigned char* aplicarXORDinamico(const unsigned char* pixelData, const unsigned char* imData, int totalBytes)
 {
     unsigned char* resultado = new unsigned char[totalBytes];
@@ -122,16 +124,35 @@ unsigned char* aplicarXORDinamico(const unsigned char* pixelData, const unsigned
     }
     return resultado;
 }
+```
 
 En cambio, la versión que se empleó para el desafío no es muy diferente en cuanto a funcionamiento, pero resuelve el mismo problema sin necesidad de reservar memoria adicional ni de reescribir todo el buffer original:
 
+```cpp
 void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes) {
     for (int i = 0; i < totalBytes; i++) {
         pixelData[i] = pixelData[i] ^ imData[i];
     }
 }
+```
 
 Lo que hace esta función es tomar el arreglo de la imagen distorsionada, el arreglo de la imagen máscara y la cantidad de valores en total (bytes). Recorre cada posición desde 0 hasta totalBytes - 1 (ya que se usa < y no <=). En cada posición toma el valor de pixelData[i] y el de imData[i], les aplica la lógica del XOR, que en C++ se representa con ^, y guarda este resultado en pixelData[i].
 
+***2 y 3 función:***
 
+Estas fueron las siguientes funciones desarrolladas, son las funciones de rotaciones. Usamos la misma lógica que con la funcion XOR solo que aplicando la operacion de rotar bits a la derecha y a la izquierda, implementamos estas dos ya que no sabemos cual de las dos rotaciones es la que nos servirá, las funciones que creamos fueron las siguientes: 
+```cpp
+void rotarDerecha(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = ((pixelData[i] >> n) | (pixelData[i] << (8 - n))) & 0xFF;
+    }
+}
+
+void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
+    for (int i = 0; i < totalBytes; i++) {
+        pixelData[i] = ((pixelData[i] << n) | (pixelData[i] >> (8 - n))) & 0xFF;
+    }
+}
+```
+& 0xFF garantiza que solo operamos con un byte (8 bits), ignorando cualquier extensión de signo o bits superiores. Evita resultados incorrectos debido a bits no deseados.
 
