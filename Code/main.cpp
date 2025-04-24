@@ -322,19 +322,15 @@ void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
     }
 }
 
-unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada,
-                             const unsigned char* pixelDataMask,
-                             int seed,
-                             int maskWidth,
-                             int maskHeight)
+unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, int seed, int maskWidth, int maskHeight)
 {
     int maskSize = maskWidth * maskHeight * 3;  // total de componentes RGB
     int offset   = seed * 3;                   // desplazamiento en bytes
 
     unsigned int* resultado = new unsigned int[maskSize];
     for (int k = 0; k < maskSize; ++k) {
-        resultado[k] = static_cast<unsigned int>(pixelDataTransformada[offset + k])
-        + static_cast<unsigned int>(pixelDataMask[k]);
+        resultado[k] = pixelDataTransformada[offset + k]
+                       + pixelDataMask[k];
     }
     return resultado;
 }
