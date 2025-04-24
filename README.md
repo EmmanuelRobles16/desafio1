@@ -156,7 +156,7 @@ void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
 ```
 & 0xFF garantiza que solo operamos con un byte (8 bits), ignorando cualquier extensión de signo o bits superiores. Evita resultados incorrectos debido a bits no deseados.
 
-*** 4 y 5 función ***
+***4 y 5 función***
 
 Estas fueron las siguientes funciones desarrolladas, son las funciones de desplazamiento. Usamos la misma lógica que con la funcion XOR y función 2 y 3, solo que aplicando la operacion de desplazar bits a la derecha y a la izquierda, implementamos estas dos ya que no sabemos cual de las dos rotaciones es la que nos servirá, las funciones que creamos fueron las siguientes: 
 
@@ -176,6 +176,42 @@ void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
 
 Esta funcion hace que cuando se desplaze hacia la derecha se pierdan los bits menos significativos que es la derecha y entran ceros por los bits mas significativos que es la izquierda, y con la función de desplazar hacia la izquierda es la inversa pero se usa &0xFF para matener el resulta de los 8 bits como en las funciones 2 y 3
 
+**Aplicar mascara**
+
+***6 función:***
+
+La siguiente función que implementamos fue una para aplicar la mascara, esto debido a que ideamos las funciones según el orden en el que las ibamos a necesitar, el bloque de codigo implementado fue:
+
+```cpp
+unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, int seed, int maskWidth, int maskHeight) {
+    int maskSize = maskWidth * maskHeight * 3;  // total de componentes RGB
+    int offset   = seed * 3;                   // desplazamiento en bytes
+
+    unsigned int* resultado = new unsigned int[maskSize];
+    for (int k = 0; k < maskSize; ++k) {
+        resultado[k] = static_cast<unsigned int>(pixelDataTransformada[offset + k])
+        + static_cast<unsigned int>(pixelDataMask[k]);
+    }
+    return resultado;
+}
+```
+La función aplicarMascara recibe el buffer de la imagen ya transformada (pixelDataTransformada), el buffer de la máscara RGB (pixelDataMask), la semilla de desplazamiento en píxeles (seed) y las dimensiones de la máscara (maskWidth, maskHeight). Primero convierte ese desplazamiento en bytes multiplicando seed por 3 y calcula el tamaño total de la máscara como maskWidth * maskHeight * 3. Luego reserva dinámicamente un arreglo de enteros de ese tamaño y recorre cada componente del canal, sumando el valor correspondiente de la imagen transformada (a partir del offset) con el de la máscara. El resultado de cada suma se almacena en el nuevo arreglo que ya creamos y así al terminar éste contiene las sumas para cada píxel de la máscara.
+
+En esta función nosotros usamos un static_cast el cual habíamos investigado que deja explícito que queremos trabajar con un entero de 32 bits sin signo para almacenar la suma. Sin embargo, al ser algo que no vimos en clase podía generar algún error o confusión, así que lo quitamos ya que de igual forma debería funcionar, quedando así la función:
+
+```cp
+unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, int seed, int maskWidth, int maskHeight) {
+    int maskSize    = maskWidth * maskHeight * 3;
+    int offsetBytes = seed * 3;
+
+    unsigned int* resultado = new unsigned int[maskSize];
+    for (int k = 0; k < maskSize; ++k) {
+        resultado[k] = pixelDataTransformada[offsetBytes + k]
+                     + pixelDataMask[k];
+    }
+    return resultado;
+}
+```
 
 
 
