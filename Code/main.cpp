@@ -37,6 +37,7 @@
 #include <QImage>
 
 using namespace std;
+
 unsigned char* loadPixels(QString input, int &width, int &height);
 bool exportImage(unsigned char* pixelData, int width,int height, QString archivoSalida);
 unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixels);
@@ -45,6 +46,10 @@ void rotarDerecha(unsigned char* pixelData, int totalBytes, int n);
 void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n);
 void desplazarDerecha(unsigned char* pixelData, int totalBytes, int n);
 void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n);
+unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, int seed, int maskWidth, int maskHeight);
+
+
+
 int main()
 {
     // Definición de rutas de archivo de entrada (imagen original) y salida (imagen modificada)
@@ -54,6 +59,16 @@ int main()
     // Variables para almacenar las dimensiones de la imagen
     int height = 0;
     int width = 0;
+    // Para cargar la máscara
+    int    maskWidth   = 0;
+    int    maskHeight  = 0;
+    unsigned char* pixelDataMask   = nullptr;
+
+    // Para almacenar la imagen transformada
+    unsigned char* pixelDataTransformada = nullptr;
+
+    // Para recoger el resultado de la máscara
+    unsigned int* maskResult = nullptr;
 
     // Carga la imagen BMP en memoria dinámica y obtiene ancho y alto
     unsigned char *pixelData = loadPixels(archivoEntrada, width, height);
@@ -97,6 +112,10 @@ int main()
         delete[] maskingData;
         maskingData = nullptr;
     }
+
+    delete[] pixelDataMask;
+    delete[] pixelDataTransformada;
+    delete[] maskResult;
 
     return 0; // Fin del programa
 }
@@ -303,7 +322,22 @@ void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
     }
 }
 
+unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada,
+                             const unsigned char* pixelDataMask,
+                             int seed,
+                             int maskWidth,
+                             int maskHeight)
+{
+    int maskSize = maskWidth * maskHeight * 3;  // total de componentes RGB
+    int offset   = seed * 3;                   // desplazamiento en bytes
 
+    unsigned int* resultado = new unsigned int[maskSize];
+    for (int k = 0; k < maskSize; ++k) {
+        resultado[k] = static_cast<unsigned int>(pixelDataTransformada[offset + k])
+        + static_cast<unsigned int>(pixelDataMask[k]);
+    }
+    return resultado;
+}
 
 
 
