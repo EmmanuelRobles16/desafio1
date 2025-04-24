@@ -47,7 +47,7 @@ void rotarIzquierda(unsigned char* pixelData, int totalBytes, int n);
 void desplazarDerecha(unsigned char* pixelData, int totalBytes, int n);
 void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n);
 unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, int seed, int maskWidth, int maskHeight);
-
+bool verificarEnmascaramiento(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, const unsigned int*   maskingData, int seed, int maskSize);
 
 
 int main()
@@ -292,6 +292,8 @@ unsigned int* loadSeedMasking(const char* nombreArchivo, int &seed, int &n_pixel
     return RGB;
 }
 
+
+
 void aplicarXOR(unsigned char* pixelData, unsigned char* imData, int totalBytes) {
     for (int i = 0; i < totalBytes; i++) {
         pixelData[i] = pixelData[i] ^ imData[i];
@@ -322,19 +324,27 @@ void desplazarIzquierda(unsigned char* pixelData, int totalBytes, int n) {
     }
 }
 
-unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, int seed, int maskWidth, int maskHeight)
-{
+unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, int seed, int maskWidth, int maskHeight) {
     int maskSize = maskWidth * maskHeight * 3;  // total de componentes RGB
     int offset   = seed * 3;                   // desplazamiento en bytes
 
     unsigned int* resultado = new unsigned int[maskSize];
     for (int k = 0; k < maskSize; ++k) {
-        resultado[k] = pixelDataTransformada[offset + k]
-                       + pixelDataMask[k];
+        resultado[k] = pixelDataTransformada[offset + k] + pixelDataMask[k];
     }
     return resultado;
 }
 
+bool verificarEnmascaramiento(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, const unsigned int*   maskingData, int seed, int maskSize) {
+    int offsetBytes = seed * 3;  // convertir píxeles a componentes RGB
+    for (int k = 0; k < maskSize; ++k) {
+        unsigned int esperado = pixelDataTransformada[offsetBytes + k]+ pixelDataMask[k];
+        if (esperado != maskingData[k]) {
+            return false;
+        }
+    }
+    return true;
+}
 
 
 
