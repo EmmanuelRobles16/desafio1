@@ -213,7 +213,25 @@ unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const u
 }
 ```
 
+**funcion de verificación **
 
+**funcion 7**
+
+Esta función recibe la imagen ya transformada (pixelDataTransformada), la máscara (pixelDataMask), los datos leídos del archivo TXT (maskingData), la semilla (seed) y el tamaño total de los canales de la máscara (maskSize). Primero convierte la semilla en un desplazamiento en bytes multiplicando seed por tres. Luego itera desde cada componente k de 0 a maskSize - 1, computa la suma esperada imagen transformada más la máscara (esperado), y la compara con el valor presente en maskingData[k]. Si alguna suma no coincide, devuelve false inmediatamente; si todas coinciden, devuelve true. Así es cómo sabes si el enmascaramiento aplicado efectivamente es un enmascaramiento o no, ya que coincide con los datos del archivo.
+
+```cp
+bool verificarEnmascaramiento(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, const unsigned int*   maskingData, int seed, int maskSize) {
+    int offsetBytes = seed * 3;  // convertir píxeles a componentes RGB
+    for (int k = 0; k < maskSize; ++k) {
+        unsigned int esperado = pixelDataTransformada[offsetBytes + k]+ pixelDataMask[k];
+        if (esperado != maskingData[k]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+```
 
 
 
