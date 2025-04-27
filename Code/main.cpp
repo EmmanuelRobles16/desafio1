@@ -50,74 +50,148 @@ unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const u
 bool verificarEnmascaramiento(const unsigned char* pixelDataTransformada, const unsigned char* pixelDataMask, const unsigned int*   maskingData, int seed, int maskSize);
 
 
-int main()
-{
-    // Definición de rutas de archivo de entrada (imagen original) y salida (imagen modificada)
-    QString archivoEntrada = "I_O.bmp";
-    QString archivoSalida = "I_D.bmp";
+int main() {
+    // Definir nombres de los archivos de entrada y salida
+    QString archivoEntrada = "I_D.bmp";    // Imagen distorsionada (P3.bmp para Caso 1)
+    QString archivoMascara = "M.bmp";      // Máscara de suma
+    QString archivoMascaraXOR = "I_M.bmp"; // Imagen de distorsión para XOR
+    QString archivoSalida = "I_D_resultado.bmp"; // Imagen reconstruida
 
-    // Variables para almacenar las dimensiones de la imagen
-    int height = 0;
-    int width = 0;
-    // Para cargar la máscara
-    int    maskWidth   = 0;
-    int    maskHeight  = 0;
-    unsigned char* pixelDataMask   = nullptr;
+    // Variables para dimensiones de las imágenes
+    int width = 0, height = 0;
+    int maskWidth = 0, maskHeight = 0;
 
-    // Para almacenar la imagen transformada
-    unsigned char* pixelDataTransformada = nullptr;
+    // Cargar la imagen distorsionada (I_D)
+    unsigned char* pixelData = loadPixels(archivoEntrada, width, height);
+    if (pixelData == nullptr) {
+        cout << "Error: No se pudo cargar I_D.bmp" << endl;
+        return -1;
+    }
+    int totalBytes = width * height * 3; // Tamaño en bytes (3 por RGB)
 
-    // Para recoger el resultado de la máscara
-    unsigned int* maskResult = nullptr;
-
-    // Carga la imagen BMP en memoria dinámica y obtiene ancho y alto
-    unsigned char *pixelData = loadPixels(archivoEntrada, width, height);
-    int totalBytes = width * height * 3;
-
-    // Simula una modificación de la imagen asignando valores RGB incrementales
-    // (Esto es solo un ejemplo de manipulación artificial)
-    for (int i = 0; i < width * height * 3; i += 3) {
-        pixelData[i] = i;     // Canal rojo
-        pixelData[i + 1] = i; // Canal verde
-        pixelData[i + 2] = i; // Canal azul
+    // Cargar la máscara de suma (M)
+    unsigned char* pixelDataMask = loadPixels(archivoMascara, maskWidth, maskHeight);
+    if (pixelDataMask == nullptr) {
+        cout << "Error: No se pudo cargar M.bmp" << endl;
+        delete[] pixelData;
+        return -1;
     }
 
-    // Exporta la imagen modificada a un nuevo archivo BMP
-    bool exportI = exportImage(pixelData, width, height, archivoSalida);
-
-    // Muestra si la exportación fue exitosa (true o false)
-    cout << exportI << endl;
-
-    // Libera la memoria usada para los píxeles
-    delete[] pixelData;
-    pixelData = nullptr;
-
-    // Variables para almacenar la semilla y el número de píxeles leídos del archivo de enmascaramiento
-    int seed = 0;
-    int n_pixels = 0;
-
-    // Carga los datos de enmascaramiento desde un archivo .txt (semilla + valores RGB)
-    unsigned int *maskingData = loadSeedMasking("M1.txt", seed, n_pixels);
-
-    // Muestra en consola los primeros valores RGB leídos desde el archivo de enmascaramiento
-    for (int i = 0; i < n_pixels * 3; i += 3) {
-        cout << "Pixel " << i / 3 << ": ("
-             << maskingData[i] << ", "
-             << maskingData[i + 1] << ", "
-             << maskingData[i + 2] << ")" << endl;
+    // Cargar la imagen de distorsión (I_M)
+    unsigned char* pixelDataMaskXOR = loadPixels(archivoMascaraXOR, width, height);
+    if (pixelDataMaskXOR == nullptr) {
+        cout << "Error: No se pudo cargar I_M.bmp" << endl;
+        delete[] pixelData;
+        delete[] pixelDataMask;
+        return -1;
     }
 
-    // Libera la memoria usada para los datos de enmascaramiento
-    if (maskingData != nullptr){
+    // Archivos de rastreo en orden inverso (M2.txt, M1.txt, M0.txt), ya que estamos realizando el proceso inverso
+    const char* archivosMasking[] = {"M2.txt", "M1.txt", "M0.txt"};
+    const int totalTransformaciones = 3; // Número de transformaciones para el Caso 1
+
+    // Procesar cada etapa en orden inverso
+    for (int etapa = 0; etapa < totalTransformaciones; etapa++) {
+        cout << "\nProcesando etapa " << etapa + 1 << " con archivo " << archivosMasking[etapa] << endl;
+
+        // Cargar el archivo de rastreo
+        int seed = 0, n_pixels = 0;
+        unsigned int* maskingData = loadSeedMasking(archivosMasking[etapa], seed, n_pixels);
+        if (maskingData == nullptr) {
+            cout << "Error: No se pudo cargar " << archivosMasking[etapa] << endl;
+            delete[] pixelData;
+            delete[] pixelDataMask;
+            delete[] pixelDataMaskXOR;
+            return -1;
+        }
+        int maskSize = n_pixels * 3; // Tamaño en bytes (3 por RGB)
+
+        // Crear una copia de la imagen actual para probar transformaciones
+        unsigned char* copia = new unsigned char[totalBytes];
+        bool transformacionEncontrada = false;
+
+        // Probar XOR
+        memcpy(copia, pixelData, totalBytes);
+        aplicarXOR(copia, pixelDataMaskXOR, totalBytes);
+        if (verificarEnmascaramiento(copia, pixelDataMask, maskingData, seed, maskSize)) {
+            cout << "Transformacion encontrada: XOR" << endl;
+            memcpy(pixelData, copia, totalBytes); // Actualizar imagen
+            transformacionEncontrada = true;
+        }
+
+        // Probar rotación izquierda (1 a 7 bits)
+        for (int n = 1; n <= 7 && !transformacionEncontrada; n++) {
+            memcpy(copia, pixelData, totalBytes);
+            rotarIzquierda(copia, totalBytes, n);
+            if (verificarEnmascaramiento(copia, pixelDataMask, maskingData, seed, maskSize)) {
+                cout << "Transformacion encontrada: Rotacion izquierda de " << n << " bits" << endl;
+                memcpy(pixelData, copia, totalBytes);
+                transformacionEncontrada = true;
+            }
+        }
+
+        // Probar rotación derecha (1 a 7 bits)
+        for (int n = 1; n <= 7 && !transformacionEncontrada; n++) {
+            memcpy(copia, pixelData, totalBytes);
+            rotarDerecha(copia, totalBytes, n);
+            if (verificarEnmascaramiento(copia, pixelDataMask, maskingData, seed, maskSize)) {
+                cout << "Transformacion encontrada: Rotacion derecha de " << n << " bits" << endl;
+                memcpy(pixelData, copia, totalBytes);
+                transformacionEncontrada = true;
+            }
+        }
+
+        // Probar desplazamiento izquierda (1 a 7 bits)
+        for (int n = 1; n <= 7 && !transformacionEncontrada; n++) {
+            memcpy(copia, pixelData, totalBytes);
+            desplazarIzquierda(copia, totalBytes, n);
+            if (verificarEnmascaramiento(copia, pixelDataMask, maskingData, seed, maskSize)) {
+                cout << "Transformacion encontrada: Desplazamiento izquierda de " << n << " bits" << endl;
+                memcpy(pixelData, copia, totalBytes);
+                transformacionEncontrada = true;
+            }
+        }
+
+        // Probar desplazamiento derecha (1 a 7 bits)
+        for (int n = 1; n <= 7 && !transformacionEncontrada; n++) {
+            memcpy(copia, pixelData, totalBytes);
+            desplazarDerecha(copia, totalBytes, n);
+            if (verificarEnmascaramiento(copia, pixelDataMask, maskingData, seed, maskSize)) {
+                cout << "Transformacion encontrada: Desplazamiento derecha de " << n << " bits" << endl;
+                memcpy(pixelData, copia, totalBytes);
+                transformacionEncontrada = true;
+            }
+        }
+
+        // Verificar si se encontró una transformación válida
+        if (!transformacionEncontrada) {
+            cout << "Error: No se encontro ninguna transformacion valida para la etapa " << etapa + 1 << endl;
+            delete[] copia;
+            delete[] maskingData;
+            delete[] pixelData;
+            delete[] pixelDataMask;
+            delete[] pixelDataMaskXOR;
+            return -1;
+        }
+
+        // Liberar memoria de la copia y el archivo de rastreo
+        delete[] copia;
         delete[] maskingData;
-        maskingData = nullptr;
     }
 
-    delete[] pixelDataMask;
-    delete[] pixelDataTransformada;
-    delete[] maskResult;
+    // Exportar la imagen reconstruida
+    if (exportImage(pixelData, width, height, archivoSalida)) {
+        cout << "Imagen reconstruida guardada como " << archivoSalida.toStdString() << endl;
+    } else {
+        cout << "Error: No se pudo guardar la imagen reconstruida" << endl;
+    }
 
-    return 0; // Fin del programa
+    // Liberar memoria de las imágenes
+    delete[] pixelData;
+    delete[] pixelDataMask;
+    delete[] pixelDataMaskXOR;
+
+    return 0;
 }
 
 
