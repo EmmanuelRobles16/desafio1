@@ -213,9 +213,9 @@ unsigned int* aplicarMascara(const unsigned char* pixelDataTransformada, const u
 }
 ```
 
-**funcion de verificación **
+**funcion de verificación**
 
-**funcion 7**
+***funcion 7***
 
 Esta función recibe la imagen ya transformada (pixelDataTransformada), la máscara (pixelDataMask), los datos leídos del archivo TXT (maskingData), la semilla (seed) y el tamaño total de los canales de la máscara (maskSize). Primero convierte la semilla en un desplazamiento en bytes multiplicando seed por tres. Luego itera desde cada componente k de 0 a maskSize - 1, computa la suma esperada imagen transformada más la máscara (esperado), y la compara con el valor presente en maskingData[k]. Si alguna suma no coincide, devuelve false inmediatamente; si todas coinciden, devuelve true. Así es cómo sabes si el enmascaramiento aplicado efectivamente es un enmascaramiento o no, ya que coincide con los datos del archivo.
 
@@ -233,5 +233,19 @@ bool verificarEnmascaramiento(const unsigned char* pixelDataTransformada, const 
 
 ```
 
+--- 
 
+## Problemas de desarrollo que se afrontó 
 
+Principalmente los problemas de desarrollo que afrontamos fueron en el main, donde ya teníamos que implementar las funciones que habiamos creado:
+
+- Al inicio no sabíamos como funcionaba la operación de rotación a nivel de bits así que tuvimos que repasar para poder realizar las funciones 
+
+- Uno de los problemas fue el como mantener la imagen distorsionada en caso de que la transformación aplicada no fuera correcta.
+  
+- Otro problema fue el de cual función de transformación ibamos a probar primero.
+  
+- En una de las partes donde mas se nos dificultó fue comparar nuestro resultado con el txt ya que en todos los intentos nos salió que no concordaba nuestro resultado con el txt.
+
+- Al no poder pasar la primera verificacion con el txt, no pudimos ver las otras verificaciones con los otros archivos de texto.
+      
