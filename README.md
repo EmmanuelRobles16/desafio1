@@ -247,5 +247,14 @@ Principalmente los problemas de desarrollo que afrontamos fueron en el main, don
   
 - En una de las partes donde mas se nos dificultó fue comparar nuestro resultado con el txt ya que en todos los intentos nos salió que no concordaba nuestro resultado con el txt.
 
-- Al no poder pasar la primera verificacion con el txt, no pudimos ver las otras verificaciones con los otros archivos de texto.
+- Al no poder pasar la primera verificación con el txt, no pudimos ver las otras verificaciones con los otros archivos de texto
+
+--- 
+
+## Evolución de la solución y consideraciones para tener en cuenta en la implementación.
+
+Mientras se realizaba la solución, en un principio se intentó aplicar transformaciones muy simples directamente sobre la imagen distorsionada, hasta que se llegó a la conclusión que se hacía necesario darle una forma más controlada para poder garantizar que la reconstrucción de la imagen original fuese correcta, así que se optó por el esquema de aplicar cada transformación (XOR, rotación, desplazamiento) sobre un buffer temporal, a la que se le aplica la máscara correspondiente, y después se correrá la verificación con el archivo de rastreo (Mx.txt), únicamente si se verifica correctamente se modificará la imagen principal, de manera que no se introduzcan errores entre etapas.
+Las consideraciones que priman para implementar, por otro lado, apuntamos que el flujo de etapas respeta el orden descendente de los archivos (M2.txt, M1.txt, M0.txt) aplicando en cada uno únicamente la transformación concreta que hemos comentado hasta el momento y liberando la memoria dinámica utilizada para evitar fugas. Por último, es conveniente también aplicar la suma de máscara a posteriori de cada transformación y antes de la verificación, de esta manera el proceso de reconstrucción es seguro.
+
+
       
